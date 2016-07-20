@@ -1,12 +1,14 @@
 extern crate sdl2;
 
+use map::TileMap;
+
 use sdl2::render::Texture;
 use sdl2::rect::Rect;
 use sdl2::render::Renderer;
 
-pub struct GameState<'a> {
+pub struct GameState {
     pub keys: [bool; 5],
-    pub logo: Sprite<'a>,
+    pub curmap: TileMap,
 }
 
 pub struct RectF {

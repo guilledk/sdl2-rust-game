@@ -2,12 +2,13 @@ extern crate time;
 extern crate sdl2;
 extern crate sdl2_image;
 
-use time::{Duration, PreciseTime};
+use time::{PreciseTime};
 
-mod gamestate;
-use gamestate::GameState;
-use gamestate::Sprite;
-use gamestate::RectF;
+mod game;
+use game::GameState;
+
+mod map;
+use map::*;
 
 use std::path::Path;
 use std::thread;
@@ -38,14 +39,19 @@ fn main() {
     .build()
     .unwrap();
 
+    renderer.set_scale(0.5, 0.5);
+
     let mut events = ctx.event_pump().unwrap();
     let texture = renderer.load_texture(&Path::new("res/rust-logo.png")).unwrap();
 
     let mut gs = GameState {
-        logo: Sprite { img: &texture, rect: RectF { x: -512.0, y: 300.0 - 256.0, w: 512.0, h: 512.0 } },
-        keys: [false, false, false, false, false]
+        keys: [false, false, false, false, false],
+        curmap: TileMap::new(
+            &Path::new("res/test-mapfile.map"),
+            &Path::new("res/default-tileset.png"),
+            &renderer
+        )
     };
-
 
     'event : loop {
 
@@ -63,9 +69,10 @@ fn main() {
         update(&mut gs);
         draw(&mut renderer, &gs);
 
-        let delta: Duration = start.to(PreciseTime::now());
+        let end = PreciseTime::now();
+        let delta = 16 - start.to(end).num_milliseconds();
 
-        thread::sleep_ms((Duration::microseconds(16666) - delta).num_milliseconds() as u32);
+        thread::sleep(std::time::Duration::from_millis(delta as u64));
 
     }
 
@@ -73,10 +80,7 @@ fn main() {
 
 fn update(gs: &mut GameState) {
 
-    gs.logo.rect.x += 1000.0 / 60.0;
-    if gs.logo.rect.x > 800.0 {
-        gs.logo.rect.x = -512.0;
-    }
+
 
 }
 
@@ -84,7 +88,8 @@ fn draw(renderer: &mut Renderer, gs: &GameState) {
 
     renderer.set_draw_color(sdl2::pixels::Color::RGB(0, 0, 0));
     renderer.clear();
-    gs.logo.draw(renderer);
+
+    gs.curmap.draw(renderer);
 
     renderer.present();
 
