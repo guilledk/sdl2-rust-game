@@ -4,5 +4,6 @@ version = "0.1.0"
 authors = ["Guillermo Rodriguez <guillermo.rodriguez.utu@gmail.com>"]
 
 [dependencies]
+time = "*"
 sdl2 = "*"
 sdl2_image = "*"
