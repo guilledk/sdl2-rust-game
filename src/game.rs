@@ -1,47 +1,12 @@
-extern crate sdl2;
-
 use map::TileMap;
-
-use sdl2::render::Texture;
-use sdl2::rect::Rect;
 use sdl2::render::Renderer;
+use utils::*;
 
 pub struct GameState {
     pub keys: [bool; 5],
     pub curmap: TileMap,
-}
-
-pub struct RectF {
-    pub x: f32,
-    pub y: f32,
-    pub w: f32,
-    pub h: f32,
-}
-
-impl RectF {
-    pub fn to_sdl_rect(&self) -> Rect {
-        Rect::new(
-            self.x.round() as i32,
-            self.y.round() as i32,
-            self.w.round() as u32,
-            self.h.round() as u32
-        )
-    }
-}
-
-pub struct Sprite<'a> {
-
-    pub img: &'a Texture,
-    pub rect: RectF,
-
-}
-
-impl<'a> Sprite<'a> {
-
-    pub fn draw(&self, renderer: &mut Renderer) {
-        renderer.copy(&self.img, None, Some(self.rect.to_sdl_rect()));
-    }
-
+    pub player: Player,
+    pub camera: PointF,
 }
 
 /*
@@ -52,3 +17,67 @@ impl<'a> Sprite<'a> {
  *  3: s
  *  4: d
  */
+
+ pub struct Player {
+     pub tilepos: PointF,
+     pub sprite: Sprite,
+     moving: bool,
+     target: PointF,
+ }
+
+impl Player {
+
+    pub fn new(tpos: PointF, sprt: Sprite) -> Player {
+        Player {
+            tilepos: tpos,
+            sprite: sprt,
+            moving: false,
+            target: PointF { x: 0.0, y: 0.0 }
+        }
+    }
+
+    pub fn update(&mut self) {
+        self.tilepos = lerp(&self.tilepos, &self.target, 0.1);
+        self.sprite.rect.pos = self.tilepos.as_screen(64.0);
+        if self.moving && (self.tilepos.x - self.target.x).abs() < 0.1 && (self.tilepos.y - self.target.y).abs() < 0.1 {
+            self.moving = false;
+        }
+    }
+    pub fn draw(&mut self, renderer: &mut Renderer, cam: &PointF) {
+        self.sprite.draw(renderer, cam);
+    }
+
+    pub fn move_down(&mut self, map: &TileMap) {
+        let inside_map = map.inside(PointF { x: self.target.x, y: self.target.y + 1.0 });
+        let can_walk = inside_map && map.tiles[self.target.x as usize][self.target.y as usize + 1].walkable;
+        if !self.moving && can_walk {
+            self.moving = true;
+            self.target.y = self.target.y + 1.0;
+        }
+    }
+    pub fn move_up(&mut self, map: &TileMap) {
+        let inside_map = map.inside(PointF { x: self.target.x, y: self.target.y - 1.0 });
+        let can_walk = inside_map && map.tiles[self.target.x as usize][self.target.y as usize - 1].walkable;
+        if !self.moving && can_walk {
+            self.moving = true;
+            self.target.y = self.target.y - 1.0;
+        }
+    }
+    pub fn move_right(&mut self, map: &TileMap) {
+        let inside_map = map.inside(PointF { x: self.target.x + 1.0, y: self.target.y });
+        let can_walk = inside_map && map.tiles[self.target.x as usize + 1][self.target.y as usize].walkable;
+        if !self.moving && can_walk {
+            self.moving = true;
+            self.target.x = self.target.x + 1.0;
+        }
+    }
+    pub fn move_left(&mut self, map: &TileMap) {
+        let inside_map = map.inside(PointF { x: self.target.x - 1.0, y: self.target.y });
+        let can_walk = inside_map && map.tiles[self.target.x as usize - 1][self.target.y as usize].walkable;
+        if !self.moving && can_walk {
+            self.moving = true;
+            self.target.x = self.target.x - 1.0;
+        }
+    }
+
+}
