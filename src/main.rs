@@ -1,5 +1,6 @@
 extern crate time;
 extern crate sdl2;
+extern crate sdl2_ttf;
 extern crate sdl2_image;
 
 use time::PreciseTime;
@@ -9,6 +10,9 @@ use game::*;
 
 mod map;
 use map::*;
+
+mod text;
+use text::*;
 
 mod input;
 use input::*;
@@ -33,6 +37,7 @@ fn main() {
     let ctx = sdl2::init().unwrap();
     sdl2_image::init(INIT_PNG | INIT_JPG).unwrap();
     let video_ctx = ctx.video().unwrap();
+    let text_context = sdl2_ttf::init().unwrap();
 
     let window = video_ctx
     .window("SDL2 Rust 0.1.0", 800, 600)
@@ -45,6 +50,12 @@ fn main() {
     .renderer()
     .build()
     .unwrap();
+
+    let text_renderer = TextRenderer::init(
+        &text_context,
+        &mut renderer,
+        &Path::new("res/fira-mono.ttf")
+    );
 
     let mut events = ctx.event_pump().unwrap();
 
@@ -88,7 +99,7 @@ fn main() {
         if gs.keys.was_pressed(Keycode::Escape) { break 'event }
 
         update(&mut gs);
-        draw(&mut renderer, &mut gs);
+        draw(&mut renderer, &text_renderer, &mut gs);
 
         let end = PreciseTime::now();
         let delta = 16 - start.to(end).num_milliseconds();
@@ -159,13 +170,15 @@ fn update(gs: &mut GameState) {
 
 }
 
-fn draw(renderer: &mut Renderer, gs: &mut GameState) {
+fn draw(renderer: &mut Renderer, text_renderer: &TextRenderer, gs: &mut GameState) {
 
     renderer.set_draw_color(sdl2::pixels::Color::RGB(0, 0, 0));
     renderer.clear();
 
     gs.curmap.draw(renderer, &gs.camera);
     gs.player.draw(renderer, &gs.camera);
+
+    text_renderer.draw_string("prueba".to_string(),renderer, 100, 100);
 
     if gs.gamemode == GameMode::Developer {
 

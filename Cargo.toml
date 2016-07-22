@@ -7,4 +7,5 @@ authors = ["Guillermo Rodriguez <guillermo.rodriguez.utu@gmail.com>"]
 time = "*"
 image = "*"
 sdl2 = "*"
+sdl2_ttf = "*"
 sdl2_image = "*"
