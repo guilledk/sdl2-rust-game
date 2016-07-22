@@ -1,15 +1,13 @@
 extern crate sdl2;
+extern crate image;
 extern crate sdl2_image;
 
 use sdl2::render::Texture;
-use sdl2_image::LoadTexture;
-use std::fs::File;
 use std::path::Path;
-use std::io::prelude::*;
 use sdl2::render::Renderer;
 use sdl2::rect::Rect;
-use std::io::BufReader;
 use utils::PointF;
+use map::image::GenericImage;
 
 #[derive(Copy, Clone, PartialEq)]
 pub enum TileType {
@@ -32,11 +30,7 @@ pub struct TileMap {
 }
 
 impl TileMap {
-
-    pub fn new(map_path: &Path, tileset_path: &Path, renderer: &Renderer) -> TileMap{
-
-        let raw_map_file = File::open(&map_path).unwrap();
-        let map_reader = BufReader::new(raw_map_file);
+    pub fn new(img_path: &Path, tset: Texture) -> TileMap {
 
         let mut map = TileMap {
             tiles: [[
@@ -47,36 +41,35 @@ impl TileMap {
                 }; 10];
             10],
             tilesize: 64,
-            tileset: renderer.load_texture(tileset_path).unwrap()
+            tileset: tset
         };
 
-        let mut y: usize = 0;
-        for line in map_reader.lines() {
-            let mut x: usize = 0;
-            for chr in line.unwrap().split(",") {
-                match chr {
-                    //Full
-                    "0" => map.tiles[x][y] = Tile { ttype: TileType::Grass, metadata: 0, walkable: true },
+        let img = image::open(img_path).unwrap();
+        let (size_x, size_y) = img.dimensions();
+        for y in 0..size_y {
+            for x in 0..size_x {
+                let pixel = img.get_pixel(x, y);
 
-                    //Corner
-                    "1" => map.tiles[x][y] = Tile { ttype: TileType::Grass, metadata: 1, walkable: true },
-                    "6" => map.tiles[x][y] = Tile { ttype: TileType::Grass, metadata: 6, walkable: true },
-                    "7" => map.tiles[x][y] = Tile { ttype: TileType::Grass, metadata: 7, walkable: true },
-                    "8" => map.tiles[x][y] = Tile { ttype: TileType::Grass, metadata: 8, walkable: true },
+                let tile_type = match pixel[0] {
+                    0 => TileType::Void,
+                    1 => TileType::Grass,
+                    2 => TileType::Dirt,
+                    _ => TileType::Void
+                };
 
-                    "2" => map.tiles[x][y] = Tile { ttype: TileType::Grass, metadata: 2, walkable: true },
-                    "3" => map.tiles[x][y] = Tile { ttype: TileType::Grass, metadata: 3, walkable: true },
-                    "4" => map.tiles[x][y] = Tile { ttype: TileType::Grass, metadata: 4, walkable: true },
-                    "5" => map.tiles[x][y] = Tile { ttype: TileType::Grass, metadata: 5, walkable: true },
-                     _  => map.tiles[x][y] = Tile { ttype: TileType::Void,  metadata: 0, walkable: false }
-                }
-                x += 1;
+                let meta = pixel[1];
+                if meta > 8 { panic!("Wrong metadata @ x: {}, y: {}.", x, y) }
+                let wable = if pixel[0] == 0 { false } else { true };
+
+                map.tiles[x as usize][y as usize] = Tile {
+                    ttype: tile_type,
+                    metadata: meta,
+                    walkable: wable
+                };
             }
-            y += 1;
         }
 
         map
-
     }
 
     pub fn draw(&self, renderer: &mut Renderer, cam: &PointF) {

@@ -1,22 +1,22 @@
 use map::TileMap;
 use sdl2::render::Renderer;
 use utils::*;
+use input::{Keyboard, Mouse};
+
+#[derive (PartialEq)]
+pub enum GameMode {
+    Quest,
+    Developer
+}
 
 pub struct GameState {
-    pub keys: [bool; 5],
+    pub gamemode: GameMode,
+    pub keys: Keyboard,
+    pub mouse: Mouse,
     pub curmap: TileMap,
     pub player: Player,
     pub camera: PointF,
 }
-
-/*
- *keys:
- *  0: Escape
- *  1: w
- *  2: a
- *  3: s
- *  4: d
- */
 
  pub struct Player {
      pub tilepos: PointF,
