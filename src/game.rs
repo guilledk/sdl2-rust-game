@@ -1,6 +1,7 @@
 use map::TileMap;
 use sdl2::render::Renderer;
 use utils::*;
+use text::GlyphAtlas;
 use input::{Keyboard, Mouse};
 
 #[derive (PartialEq)]
@@ -16,6 +17,7 @@ pub struct GameState {
     pub curmap: TileMap,
     pub player: Player,
     pub camera: PointF,
+    pub default_atlas: GlyphAtlas,
 }
 
  pub struct Player {

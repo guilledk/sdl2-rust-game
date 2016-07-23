@@ -51,12 +51,6 @@ fn main() {
     .build()
     .unwrap();
 
-    let text_renderer = TextRenderer::init(
-        &text_context,
-        &mut renderer,
-        &Path::new("res/fira-mono.ttf")
-    );
-
     let mut events = ctx.event_pump().unwrap();
 
     let mut gs = GameState {
@@ -77,7 +71,13 @@ fn main() {
                 }
             }
         ),
-        camera: PointF { x: 0.0, y: 0.0 }
+        camera: PointF { x: 0.0, y: 0.0 },
+        default_atlas: GlyphAtlas::from_path(
+            &Path::new("res/fira-mono.ttf"),
+            &text_context,
+            &renderer,
+            20
+        )
     };
 
     'event : loop {
@@ -99,7 +99,7 @@ fn main() {
         if gs.keys.was_pressed(Keycode::Escape) { break 'event }
 
         update(&mut gs);
-        draw(&mut renderer, &text_renderer, &mut gs);
+        draw(&mut renderer, &mut gs);
 
         let end = PreciseTime::now();
         let delta = 16 - start.to(end).num_milliseconds();
@@ -170,7 +170,7 @@ fn update(gs: &mut GameState) {
 
 }
 
-fn draw(renderer: &mut Renderer, text_renderer: &TextRenderer, gs: &mut GameState) {
+fn draw(renderer: &mut Renderer, gs: &mut GameState) {
 
     renderer.set_draw_color(sdl2::pixels::Color::RGB(0, 0, 0));
     renderer.clear();
@@ -178,7 +178,7 @@ fn draw(renderer: &mut Renderer, text_renderer: &TextRenderer, gs: &mut GameStat
     gs.curmap.draw(renderer, &gs.camera);
     gs.player.draw(renderer, &gs.camera);
 
-    text_renderer.draw_string("prueba".to_string(),renderer, 100, 100);
+    gs.default_atlas.draw_string("SDL2 rust text rendering!".to_string(), renderer, 100, 100);
 
     if gs.gamemode == GameMode::Developer {
 
