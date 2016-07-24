@@ -30,6 +30,8 @@ use sdl2::render::Renderer;
 
 use sdl2_image::{LoadTexture, INIT_PNG, INIT_JPG};
 
+const VERSION: Option<&'static str> = option_env!("CARGO_PKG_VERSION");
+
 fn main() {
 
     println!("Hello, world!");
@@ -73,7 +75,7 @@ fn main() {
         ),
         camera: PointF { x: 0.0, y: 0.0 },
         default_atlas: GlyphAtlas::from_path(
-            &Path::new("res/fira-mono.ttf"),
+            &Path::new("res/arial.ttf"),
             &text_context,
             &renderer,
             20
@@ -178,14 +180,14 @@ fn draw(renderer: &mut Renderer, gs: &mut GameState) {
     gs.curmap.draw(renderer, &gs.camera);
     gs.player.draw(renderer, &gs.camera);
 
-    gs.default_atlas.draw_string("SDL2 rust text rendering!".to_string(), renderer, 100, 100);
-
     if gs.gamemode == GameMode::Developer {
 
         let tilehover = PointF { x: gs.mouse.tilepos.x.floor(), y: gs.mouse.tilepos.y.floor() }.as_screen(64.0);
         let hover_rect = Rect::new(tilehover.x as i32 - gs.camera.x as i32, tilehover.y as i32 - gs.camera.y as i32, 64, 64);
         renderer.set_draw_color(sdl2::pixels::Color::RGB(255, 0, 0));
         renderer.draw_rect(hover_rect);
+
+        gs.default_atlas.draw_string(format!("v{}", VERSION.unwrap_or("unknown")), renderer, 0, 0);
 
     }
 

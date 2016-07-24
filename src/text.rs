@@ -62,4 +62,19 @@ impl GlyphAtlas {
             xpos += cur_width as i32;
         }
     }
+
+    pub fn draw_string_colored(&mut self, text: String, renderer: &mut Renderer, x: i32, y: i32, r: u8, g: u8, b: u8) {
+        let mut xpos: i32 = 0;
+        for c in text.chars() {
+            if c == ' ' { xpos += 11; continue }
+            if c as u32 > 122 { panic!("Can't print '{}'", c) }
+            let cur_width = self.font.find_glyph_metrics(c).unwrap().maxx as u32;
+            let dst = Rect::new(xpos + x,y,cur_width,self.height);
+            let src = Rect::new((c as i32 - 32) * 32,0,cur_width,self.height);
+            self.glyphs.set_color_mod(r, g, b);
+            renderer.copy(&self.glyphs, Some(src), Some(dst));
+            self.glyphs.set_color_mod(255, 255, 255);
+            xpos += cur_width as i32;
+        }
+    }
 }
