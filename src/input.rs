@@ -34,9 +34,11 @@ impl Mouse {
  *  3: s
  *  4: d
  *  5: F1
+ *  6: q
+ *  7: e
  */
 
-const NUM_KEYS: usize = 7;
+const NUM_KEYS: usize = 9;
 
 pub struct Keyboard {
     pressed: [bool; NUM_KEYS],
@@ -69,6 +71,8 @@ impl Keyboard {
             Keycode::D      => { self.down[4] = true; self.pressed[4] = true },
             Keycode::F1     => { self.down[5] = true; self.pressed[5] = true },
             Keycode::Space  => { self.down[6] = true; self.pressed[6] = true },
+            Keycode::Q      => { self.down[7] = true; self.pressed[7] = true },
+            Keycode::E      => { self.down[8] = true; self.pressed[8] = true },
             _               => {},
 
         }
@@ -84,6 +88,8 @@ impl Keyboard {
             Keycode::D      => { self.down[4] = false; self.released[4] = true },
             Keycode::F1     => { self.down[5] = false; self.released[5] = true },
             Keycode::Space  => { self.down[6] = false; self.released[6] = true },
+            Keycode::Q      => { self.down[7] = false; self.released[7] = true },
+            Keycode::E      => { self.down[8] = false; self.released[8] = true },
             _               => {},
 
         }
@@ -99,6 +105,8 @@ impl Keyboard {
             Keycode::D      => self.down[4],
             Keycode::F1     => self.down[5],
             Keycode::Space  => self.down[6],
+            Keycode::Q      => self.down[7],
+            Keycode::E      => self.down[8],
             _               => panic!("Keycode: {:?} not implemented.", key),
 
         }
@@ -114,6 +122,8 @@ impl Keyboard {
             Keycode::D      => self.pressed[4],
             Keycode::F1     => self.pressed[5],
             Keycode::Space  => self.pressed[6],
+            Keycode::Q      => self.pressed[7],
+            Keycode::E      => self.pressed[8],
             _               => panic!("Keycode: {:?} not implemented.", key),
 
         }
@@ -129,6 +139,8 @@ impl Keyboard {
             Keycode::D      => self.released[4],
             Keycode::F1     => self.released[5],
             Keycode::Space  => self.released[6],
+            Keycode::Q      => self.released[7],
+            Keycode::E      => self.released[8],
             _               => panic!("Keycode: {:?} not implemented.", key),
 
         }

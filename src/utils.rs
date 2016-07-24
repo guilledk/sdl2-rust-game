@@ -46,6 +46,18 @@ impl PointF {
             y: (self.y / tilesize)
         }
     }
+    pub fn floor(&self) -> PointF {
+        PointF {
+            x: self.x.floor(),
+            y: self.y.floor()
+        }
+    }
+    pub fn ceil(&self) -> PointF {
+        PointF {
+            x: self.x.ceil(),
+            y: self.y.ceil()
+        }
+    }
 }
 
 //Rect Float

@@ -148,6 +148,12 @@ fn update(gs: &mut GameState) {
         if gs.keys.was_pressed(Keycode::F1) {
             gs.gamemode = GameMode::Quest;
         }
+        if gs.keys.was_pressed(Keycode::Q) {
+            gs.curmap.add_column();
+        }
+        if gs.keys.was_pressed(Keycode::E) {
+            gs.curmap.add_row();
+        }
 
         const DEBUG_CAM_SPEED: f32 = 16.0;
 
